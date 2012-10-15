@@ -18,6 +18,7 @@
 
   var map;
   var wmsLayer;
+  var wmsLayer_stile;
   
   var wmsServer    = "<%= tb.getWmsUrl() %>";
   var sldServer    = "<%= tb.getGsldUrl()%>";  
@@ -46,6 +47,8 @@
   function setThematics() {
 
       wmsLayer.setVisibility( false );
+      wmsLayer_stile.setVisibility( false );
+      
       Ext.get('mapLegend').update('&nbsp;',true);
       
       var criteria =  Ext.get('tcriteria').dom.value;
@@ -72,12 +75,21 @@
     	   url: m_url,
     	   type:'POST',
     	   success: function() {
-               this.setLegend();
-               wmsLayer.redraw( true );
-               map.setCenter( map.getCenter(),
-                              map.getZoom(), 
-                              false, true );
-               wmsLayer.setVisibility( true );
+    		   
+    		   map.setCenter( map.getCenter(),
+                       map.getZoom(), 
+                       false, true );
+    		   
+    		   if( themetype != "Heatmap" ) {
+    			   this.setLegend();
+                   wmsLayer.redraw( true );
+                   wmsLayer.setVisibility( true );
+    		   }
+    		   else {
+    			   wmsLayer_stile.mergeNewParams({'styles': criteria });
+                   wmsLayer_stile.redraw( true );
+    			   wmsLayer_stile.setVisibility(true);
+    		   }    		                                 
            }
       });
   }
@@ -92,7 +104,8 @@
       "&FORMAT="+mFormat+
       "&LAYER="+mLayers+
       "&TRANSPARENT=TRUE"+
-      "&SRS="+mSRS+            
+      "&SRS="+mSRS+     
+      "&STYLES=aaa"+
       "&BBOX="+map.getExtent().toBBOX()+
       "&SERVICE=wms"+
       "&DATE="+date.getTime()+" id=\"legend\" /></center>";
@@ -180,19 +193,39 @@
 	  
 	  var ext      = map.getExtent().transform(merc,latlon);
 	  
-      var imgHtml  = wmsServer+
-      "?REQUEST=GetPDFGraphic"+
-      "&FORMAT="+mFormat+
-      "&LAYER="+mLayers+
-      "&TRANSPARENT=TRUE"+
-      "&SRS=EPSG:4326"+            
-      "&BBOX="+ext.toBBOX()+
-      "&SERVICE=wms"+
-      "&VIEWPARAMS="+mViewParams+
-      "&PDF_TITLE="+encodeURI(title)+
-      "&PDF_NOTE="+encodeURI(description)+
-      "&DATE="+date.getTime();
-
+	  var criteria =  Ext.get('tcriteria').dom.value;
+	  var themetype=  Ext.get('types'   ).dom.value;
+	  
+	  if( themetype == "Heatmap" ) {
+		  var imgHtml  = wmsServer+
+		    "?REQUEST=GetPDFGraphic"+
+		    "&FORMAT="+mFormat+
+		    "&LAYERS="+mLayers+
+		    "&TRANSPARENT=TRUE"+
+		    "&SRS=EPSG:4326"+            
+		    "&BBOX="+ext.toBBOX()+
+		    "&SERVICE=wms"+
+		    "&STYLES="+criteria+
+		    "&VIEWPARAMS="+mViewParams+
+		    "&PDF_TITLE="+encodeURI(title)+
+		    "&PDF_NOTE="+encodeURI(description)+
+		    "&DATE="+date.getTime();
+	  }
+	  else {
+		  var imgHtml  = wmsServer+
+		    "?REQUEST=GetPDFGraphic"+
+		    "&FORMAT="+mFormat+
+		    "&LAYERS="+mLayers+
+		    "&TRANSPARENT=TRUE"+
+		    "&SRS=EPSG:4326"+            
+		    "&BBOX="+ext.toBBOX()+
+		    "&SERVICE=wms"+
+		    "&VIEWPARAMS="+mViewParams+
+		    "&PDF_TITLE="+encodeURI(title)+
+		    "&PDF_NOTE="+encodeURI(description)+
+		    "&DATE="+date.getTime();
+	  }
+	  
       //window.open( imgHtml );
       
       var iframe;
@@ -244,13 +277,33 @@
                   layers     : mLayers,
                   format     : mFormat,
                   viewparams : mViewParams,
-                  tiled      : "TRUE",
+                //tiled      : "false",
+                //styles     : "col1",
                   tilesorigin: [map.maxExtent.left,map.maxExtent.bottom]                        
               },
               { isBaseLayer: false,
-              //singleTile: true,
-                tileSize: new OpenLayers.Size(512,512), 
-                buffer: 0,
+                singleTile : false,
+                tileSize   : new OpenLayers.Size(512,512), 
+                buffer     : 0,
+                displayInLayerSwitcher: false } 
+          );
+	  
+	  wmsLayer_stile = new OpenLayers.Layer.WMS(
+              "Geoserver Presentation", 
+              wmsServer,        
+              {
+                  transparent: true,
+                  layers     : mLayers,
+                  format     : mFormat,
+                  viewparams : mViewParams,
+                //tiled      : "false",
+                //styles     : "col1",
+                  tilesorigin: [map.maxExtent.left,map.maxExtent.bottom]                        
+              },
+              { isBaseLayer: false,
+                singleTile : true,
+                tileSize   : new OpenLayers.Size(512,512), 
+                buffer     : 0,
                 displayInLayerSwitcher: false } 
           );
       
@@ -259,6 +312,7 @@
                 'maxZoomLevel'     : 20,
                 'sphericalMercator': true
               },{isBaseLayer: true});
+      
       var googlePhys  = new OpenLayers.Layer.Google( 'Google Physical',
               { 'minZoomLevel'     : 1,
                 'maxZoomLevel'     : 20,
@@ -275,7 +329,8 @@
        
       var osm = new OpenLayers.Layer.OSM(); 
       
-      map.addLayers([googleSat,googleLayer,googlePhys,osm,wmsLayer]);
+      map.addLayers([googleSat,googleLayer,googlePhys,osm,
+                     wmsLayer,wmsLayer_stile]);
 
       var geographic = new OpenLayers.Projection("<%= tb.getSrs() %>");
       var mercator   = new OpenLayers.Projection(mSRS);
@@ -284,6 +339,7 @@
       map.addControl(new OpenLayers.Control.LayerSwitcher());
 
       wmsLayer.setVisibility( false );
+      wmsLayer_stile.setVisibility( false );
   }
   
   Ext.onReady(function() {
@@ -299,13 +355,26 @@
 		    fields: ['id','range'],
 		    data  : [<%= tb.getThemeRanges() %>] });
 	    
-	    var themeType = new Ext.data.SimpleStore({
-            fields: ['id','type'],
-            data: [['EQRange','Equal Range'],
-                   ['EQCount','Equal Count'],
-                   ['Natural','Natural Breaks'],
-                   ['Standard','Standard Deviation']]});  
-
+	    var themeType;
+	    
+	    if( mLayerType == "point" ) {
+	        themeType = new Ext.data.SimpleStore({
+                fields: ['id','type'],
+                data: [['EQRange' ,'Equal Range'],
+                       ['EQCount' ,'Equal Count'],
+                       ['Natural' ,'Natural Breaks'],
+                       ['Standard','Standard Deviation'],
+                       ['Heatmap' ,'Heat Map']]});
+	    }
+	    else {
+	    	themeType = new Ext.data.SimpleStore({
+	    	    fields: ['id','type'],
+	    	    data: [['EQRange' ,'Equal Range'],
+                       ['EQCount' ,'Equal Count'],
+                       ['Natural' ,'Natural Breaks'],
+                       ['Standard','Standard Deviation']]});  
+	    }
+	    
         var themeColor = new Ext.data.SimpleStore({
             fields: ['id','color'],
             data: [<%= tb.getColorNames() %>]});
@@ -416,6 +485,7 @@
 	    
         Ext.get('mapRes').on('click', function() {
             wmsLayer.setVisibility( false );
+            wmsLayer_stile.setVisibility( false );
             Ext.get('mapLegend').update('&nbsp;',true);
             Ext.getCmp('mapPrn').setDisabled(true);
         });

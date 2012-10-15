@@ -31,7 +31,7 @@ import java.util.*;
 
 import geotheme.wfsUtil.wfsRangeList;
 import geotheme.color.rangeColor;
-import geotheme.sld.thematicSld;
+import geotheme.sld.*;
 
 /**
  * Servlet implementation class gsld
@@ -182,53 +182,67 @@ public class generateSLD extends HttpServlet {
         // * Creating the SLD
         // ************************************
 
-        thematicSld sld = new thematicSld();
-        StringBuffer sldBuff = sld.addHeader(typeName);
+        StringBuffer sldBuff = new StringBuffer();
+        
+        if( typeRange.compareToIgnoreCase("Heatmap") == 0 ) {
+            heatmapSld  hsld = new heatmapSld();
+            sldBuff = hsld.createSld(propName, "", "");
+        }
+        else {
+            thematicSld sld = new thematicSld();
+            sldBuff = sld.addHeader(typeName);
 
-        int i;
-        
-        int ptRng  = (int) Math.ceil( (19-4)/(ranges.size()-1) );
-        int ptSize = 5 + ptRng; //min size is 5
-        
-        for ( i = 0; i < (ranges.size() - 2); i++ ) {
-        	if( geoType.compareToIgnoreCase("point") == 0 ) {
-        		
-        		sld.setPointSize( ptSize );
-        		ptSize += ptRng;
-        		
-        		if(ptSize > 17)
-        			ptSize = 17;
-        	}
+            int i;
+
+            int ptRng  = (int) Math.ceil( (19-4)/(ranges.size()-1) );
+            int ptSize = 5 + ptRng; //min size is 5
+
+            for ( i = 0; i < (ranges.size() - 2); i++ ) {
+                if( geoType.compareToIgnoreCase("point") == 0 ) {
+
+                    sld.setPointSize( ptSize );
+                    ptSize += ptRng;
+
+                    if(ptSize > 17)
+                        ptSize = 17;
+                }
+                sldBuff = sld.addRule( sldBuff, propName, 
+                        ranges.get(i).doubleValue(), 
+                        ranges.get(i + 1).doubleValue(), 
+                        colors.get(i),false, geoType );
+            }
+
+            if( geoType.compareToIgnoreCase("point") == 0 ) {
+                if( ptSize < 17 ) 
+                    ptSize = 17;
+
+                sld.setPointSize( ptSize );
+            }
             sldBuff = sld.addRule( sldBuff, propName, 
                     ranges.get(i).doubleValue(), 
                     ranges.get(i + 1).doubleValue(), 
-                    colors.get(i),false, geoType );
-        }
+                    colors.get(i),true, geoType );
 
-        if( geoType.compareToIgnoreCase("point") == 0 ) {
-        	if( ptSize < 17 ) 
-        		ptSize = 17;
-        	
-    		sld.setPointSize( ptSize );
-    	}
-        sldBuff = sld.addRule( sldBuff, propName, 
-                ranges.get(i).doubleValue(), 
-                ranges.get(i + 1).doubleValue(), 
-                colors.get(i),true, geoType );
-        
-        if( labScale.length() > 0 ) {
-          sldBuff = sld.addLabelRule(sldBuff, labScale,propName);
-        }
-        sldBuff = sld.addFooter(sldBuff);
+            if( labScale.length() > 0 ) {
+                sldBuff = sld.addLabelRule(sldBuff, labScale,propName);
+            }
+            sldBuff = sld.addFooter(sldBuff);
 
+        }
         // ************************************
         // * Writing to Session
         // ************************************
         String tSld = sldBuff.toString();
-
+        
         HttpSession session = request.getSession(true);
-        session.setAttribute( typeName, tSld );
-
+        
+        if( typeRange.compareToIgnoreCase("Heatmap") == 0 ){
+            session.setAttribute(typeName, null);
+        }
+        else {
+            session.setAttribute( typeName, tSld );
+        }
+        
         response.setContentType("text/text");
         response.getWriter().write(session.getId());
 
