@@ -13,7 +13,7 @@
 <SCRIPT type="text/javascript" src="resources/lib/extJS/ext-all.js"></SCRIPT>
 
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"></script>
-    
+     
 <SCRIPT type="text/javascript">
 
   var map;
