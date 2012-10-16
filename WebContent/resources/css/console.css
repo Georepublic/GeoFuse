@@ -45,6 +45,10 @@
     text-indent: 0px;
     text-transform: none;
 }
+
+a:link { color: #ee44ac; text-decoration: none; }
+a:visited { color: #ee44ac; text-decoration: none; }
+
 .Header {
     color: rgb(255, 255, 255);
     font-family: 'Futura-Medium', 'Futura', 'Trebuchet MS', sans-serif;
