@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -13,129 +13,138 @@
 
 <style type="text/css">
 body {
-	background-image: url("resources/graphics/PhotoGray_bg_c-1.jpg");
-	background-repeat: repeat;
+    background-image: url("resources/graphics/PhotoGray_bg_c-1.jpg");
+    background-repeat: repeat;
 }
 
 textarea {
-	width: 700px;
-	height: 30px;
-	border: 3px solid #464646;
-	font-family: arial;
-	font-size: 14px;
-	padding: 5px;
-	color: #464646;
-	background-color: #eeffff;
+    width: 700px;
+    height: 30px;
+    border: 3px solid #464646;
+    font-family: arial;
+    font-size: 14px;
+    padding: 5px;
+    color: #464646;
+    background-color: #eeffff;
 }
 </style>
 <script type="text/javascript">
-	var mapOL = "http://";
-	var mapZD = "http://";
+    var mapOL = "http://";
+    var mapZD = "http://";
 
-	function clearText() {
-		Ext.get('tdata').dom.value = '';
-		Ext.get('turl').dom.value = 'http://';
-		Ext.get('b_in').dom.disabled = null;
+    function clearText() {
+        Ext.get('tdata').dom.value = '';
+        Ext.get('turl').dom.value = 'http://';
+        Ext.get('b_in').dom.disabled = null;
+        Ext.get('maptype1').dom.checked = true;
 
-		mapOL = "http://";
-		mapZD = "http://";
-	};
+        mapOL = "http://";
+        mapZD = "http://";
+    };
 
-	function switchMap(mtype) {
+    function switchMap(mtype) {
 
-		var url = Ext.get('turl').dom.value;
+        var url = Ext.get('turl').dom.value;
 
-		if (url.indexOf("Error") < 0) {
-			if (mtype == "ol")
-				Ext.get('turl').dom.value = mapOL;
-			else
-				Ext.get('turl').dom.value = mapZD;
-		}
-	};
+        if (url.indexOf("Error") < 0) {
+            if (mtype == "ol")
+                Ext.get('turl').dom.value = mapOL;
+            else
+                Ext.get('turl').dom.value = mapZD;
+        }
+    };
 
-	function openWin() {
-		var url = Ext.get('turl').dom.value;
+    function openWin() {
+        var url = Ext.get('turl').dom.value;
 
-		if (url.indexOf("Error") < 0 && url != 'http://') {
-			window.open(url, "_newtab");
-		}
-	};
+        if (url.indexOf("Error") < 0 && url != 'http://') {
+            window.open(url, "_newtab");
+        }
+    };
 
-	function sendText() {
+    function sendText() {
 
-		var txtData = Ext.get('tdata').dom.value;
-		var mapType = 'ol';
+        var txtData = Ext.get('tdata').dom.value;
+        var mapType = 'ol';
 
-		Ext.Ajax.request({
-			url : 'indata',
-			method : 'POST',
-			params : {
-				data : txtData,
-				type : mapType
-			},
-			success : function(result, request) {
-				Ext.get('turl').dom.value = result.responseText;
+        Ext.Ajax.request({
+            url : 'indata',
+            method : 'POST',
+            params : {
+                data : txtData,
+                type : mapType
+            },
+            success : function(result, request) {
+                Ext.get('turl').dom.value = result.responseText;
+                Ext.get('maptype1').dom.checked = true;
 
-				var url = result.responseText;
+                var url = result.responseText;
 
-				if (url.indexOf("Error") < 0) {
-					mapOL = url;
-					mapZD = url.replace('showtheme', 'zshowtheme');
-				}
-			},
-			failure : function() {
-				Ext.get('turl').dom.value = 'Error: Server Request';
-			}
-		});
+                if (url.indexOf("Error") < 0) {
+                    mapOL = url;
+                    mapZD = url.replace('showtheme', 'zshowtheme');
+                }
+            },
+            failure : function() {
+                Ext.get('turl').dom.value = 'Error: Server Request';
+            }
+        });
 
-		Ext.get('b_in').dom.disabled = 'true';
-	};
+        Ext.get('b_in').dom.disabled = 'true';
+    };
 </script>
 </head>
 <body>
-	<img src="resources/graphics/shapeimage_1.png" />&nbsp;
-	<img src="resources/graphics/shapeimage_2.png" />
-	<div class="Header">Geo-Fuse</div>
-	<div class="Title" >a Location Intelligence Tool</div>
-	<br />
-	<div class="Body" style="width:700px;">
-		<p>Place data at the textbox below.</p>
-		<p>
-			■ <u>Linking Data with Maps</u>: 
-			&nbsp;The first column name must contain the pre-defined column
-			that will link the entered data with a map (i.e. city,province,etc).
-			Maximum number of data columns is 10.
-		</p>
-		<p>
-			■ <u>Displaying Longitude/Latitude points</u>: 
-			&nbsp;The first column must be an identifier, and the 
-			last 2 column name should be "lon,lat" that contains the 
-			WGS84 points. Maximum number of data columns is 10 exlcluding
-			the "long,lat" columns.
-		</p>
-	</div>
-	
-	<textarea id="tdata">
+    <img src="resources/graphics/shapeimage_1.png" />&nbsp;
+    <img src="resources/graphics/shapeimage_2.png" />
+    <div class="Header">Geo-Fuse</div>
+    <div class="Title" >a Location Intelligence Tool</div>
+    <br />
+    <div class="Body" style="width:700px;">
+        <p>Place CSV or TAB delimited data at the textbox below.</p>
+        <p>
+            ■ <u>Linking Data with Maps</u>: 
+            &nbsp;The first column name must contain the pre-defined column
+            that will link the entered data with a map (i.e. city,province,etc).
+            Maximum number of data columns is 10.
+        </p>
+        <p>
+            ■ <u>Displaying Longitude/Latitude points</u>: 
+            &nbsp;The first column must be an identifier, and the 
+            last 2 column name should be "lon,lat" that contains the 
+            WGS84 points. Maximum number of data columns is 10 exlcluding
+            the "long,lat" columns.
+        </p>
+                <p>
+        Use these <a href="sampdata.html" target="_data">Sample CSV Data</a> or paste the contents of each worksheet of this <a href="https://docs.google.com/spreadsheet/ccc?key=0AiIuGZR_ikZtdFYySm0ycS1QTFFMTUpCa0JidzE2X1E#gid=1" target="_worksheet">Spreadsheet</a> as reference.
+        </p>
+    </div>
+    
+    <textarea id="tdata">
     </textarea>
-	
-	<br />
-	<br />
-	<input type="button" id="b_in" value="Submit" onclick="sendText();">
-	&nbsp;
-	<input type="button" value="Reset" onclick="clearText();">
+    
+    <br />
+    <br />
+    <input type="button" id="b_in" value="Submit" onclick="sendText();">
+    &nbsp;
+    <input type="button" value="Reset" onclick="clearText();">
 
-	<script type="text/javascript">
-		elasticTextArea("tdata");
-	</script>
+    <script type="text/javascript">
+        elasticTextArea("tdata");
+    </script>
 
-	<div class="Body" style="width:700px;">
-	   <p>Map URL</p>
-	</div>
-
-	<textarea id="turl">http://</textarea>
-
-	<br />
-	<br />
-	<input type="button" value="Display Map" id="b_view" onclick="openWin();">
+    <div class="Body" style="width:700px;">
+       <p>Map URL</p>
+    </div>
+    <!-- 
+    <font color="darkred"> <input type="radio" id="maptype1"
+        name="maptype" onclick="switchMap('ol');" checked>OpenLayers
+        地図&nbsp;
+    </font>
+     -->
+    <textarea id="turl">http://</textarea>
+    <br />
+    <br />
+    <input type="button" value="Display Map" id="b_view" onclick="openWin();">
 </body>
 </html>

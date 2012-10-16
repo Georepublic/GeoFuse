@@ -7,13 +7,18 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <TITLE>Geoserver Thematics</TITLE>
 <LINK rel="stylesheet" type="text/css" href="resources/lib/extJS/resources/css/ext-all.css" />
-
+<!-- 
 <SCRIPT type="text/javascript" src="resources/lib/OpenLayers/OpenLayers.js"></SCRIPT>
+ -->
+<script src="http://openlayers.org/dev/OpenLayers.js"></script>
+
 <SCRIPT type="text/javascript" src="resources/lib/extJS/ext-base.js"></SCRIPT>
 <SCRIPT type="text/javascript" src="resources/lib/extJS/ext-all.js"></SCRIPT>
 
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"></script>
-     
+
+<script type="text/javascript" src="http://portal.cyberjapan.jp/sys/v4/webtis/webtis_v4.js" charset="UTF-8"></script>     
+
 <SCRIPT type="text/javascript">
 
   var map;
@@ -329,14 +334,18 @@
        
       var osm = new OpenLayers.Layer.OSM(); 
       
-      map.addLayers([googleSat,googleLayer,googlePhys,osm,
+      var webtisMap = new webtis.Layer.BaseMap("電子国土Web");
+
+      map.addLayers([googleSat,googleLayer,googlePhys,osm,webtisMap,
                      wmsLayer,wmsLayer_stile]);
 
       var geographic = new OpenLayers.Projection("<%= tb.getSrs() %>");
       var mercator   = new OpenLayers.Projection(mSRS);
         
       map.zoomToExtent( boundsGeoserver.transform(geographic, mercator));
+      
       map.addControl(new OpenLayers.Control.LayerSwitcher());
+      map.addControl(new OpenLayers.Control.Attribution());
 
       wmsLayer.setVisibility( false );
       wmsLayer_stile.setVisibility( false );
