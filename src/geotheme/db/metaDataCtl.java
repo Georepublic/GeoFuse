@@ -204,8 +204,12 @@ public class metaDataCtl {
                     pstmt.setDouble(k+1,0d);
                 }
 
-				pstmt.executeUpdate();
+				pstmt.addBatch();
+				
+				if( i % 200 == 0 )
+				    pstmt.executeBatch();
 			}
+			pstmt.executeBatch();
 			
 			stmt.close();
 			pstmt.close();
@@ -297,8 +301,13 @@ public class metaDataCtl {
 				insertSt.append(y).append(")");
 								
 				pstmt.setString(12, insertSt.toString());
-				pstmt.executeUpdate();
+				pstmt.addBatch();
+				
+				if( i % 200 == 0)
+				    pstmt.executeBatch();				
 			}
+			
+			pstmt.executeBatch();
 			
 			stmt.close();
 			pstmt.close();
