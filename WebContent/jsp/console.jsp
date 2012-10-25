@@ -113,7 +113,7 @@ textarea {
             &nbsp;The first column must be an identifier, and the 
             last 2 column name should be "lon,lat" that contains the 
             WGS84 points. Maximum number of data columns is 10 exlcluding
-            the "long,lat" columns.
+            the "lon,lat" columns.
         </p>
                 <p>
         Use these <a href="sampdata.html" target="_data">Sample CSV Data</a> or paste the contents of each worksheet of this <a href="https://docs.google.com/spreadsheet/ccc?key=0AiIuGZR_ikZtdFYySm0ycS1QTFFMTUpCa0JidzE2X1E#gid=1" target="_worksheet">Spreadsheet</a> as reference.
