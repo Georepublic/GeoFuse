@@ -190,6 +190,62 @@
 	
   }
   
+  function getUrlVars() {
+	    var vars = {};
+	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, 
+	    		function(m,key,value) { vars[key] = value; });
+	    return vars;
+  }
+  
+  function shareView() {
+
+      var url = /*window.location.protocol + "://" +*/ 
+    	  "http://"+ window.location.host + 
+                window.location.pathname;
+      
+      var sLayer    = this.getUrlVars()["layer"];
+      var sBnd      = map.getExtent();
+      
+      var sCriteria = Ext.get('tcriteria').dom.value;
+      var sTypes    = Ext.get('types'    ).dom.value;
+      var sColors   = Ext.get('colors'   ).dom.value;
+      var sRanges   = Ext.get('ranges'   ).dom.value;
+      
+      url = url.concat("?<br>layer=").concat(sLayer);
+      url = url.concat("<br>&bnd=").concat(sBnd);
+      url = url.concat("<br>&criteria=").concat(sCriteria);
+      url = url.concat("<br>&types=").concat(sTypes);
+      url = url.concat("<br>&ranges=").concat(sRanges);
+      url = url.concat("<br>&colors=").concat(sColors);
+      
+      Ext.MessageBox.alert( "Share View",url );
+  }
+
+  function setFromParams() {
+
+	  var pRanges   = this.getUrlVars()["ranges"];
+      var pCriteria = this.getUrlVars()["criteria"];
+      var pTypes    = this.getUrlVars()["types"];
+      var pColors   = this.getUrlVars()["colors"];
+      var pBnd      = this.getUrlVars()["bnd"];
+      
+      if( pRanges != null )
+    	  Ext.getCmp('rangesId').setValue(pRanges);
+      if( pCriteria != null )
+    	  Ext.getCmp('criteriaId').setValue(pCriteria);
+      if( pTypes != null )
+    	  Ext.getCmp('typesId').setValue(pTypes);
+      if( pColors )
+    	  Ext.getCmp('colorsId').setValue(pColors);
+      
+      if( pBnd != null ){
+    	  var tBnd = pBnd.split(',');
+    	  map.zoomToExtent(new OpenLayers.Bounds(
+    			  tBnd[0],tBnd[1],tBnd[2],tBnd[3]) );
+      }
+      
+  }
+  
   function setPDF(title,description) {
 
 	  var date     = new Date();
@@ -424,6 +480,7 @@
 			                              { xtype: 'combo',    
 	                                        fieldLabel: 'Ranges',	                                        
 	                                        name: 'ranges',
+	                                        id: 'rangesId',
 	                                        hiddenName: 'ranges',
 	                                        mode: 'local',
 	                                        store: themeRange,
@@ -439,6 +496,7 @@
 	                                      { xtype: 'combo',
 	                                        fieldLabel: 'Type',
 	                                        name: 'types',
+	                                        id: 'typesId',
 	                                        hiddenName: 'types',
 	                                        mode: 'local',
 	                                        store: themeType,
@@ -454,6 +512,7 @@
 	                                      { xtype: 'combo',
                                             fieldLabel: 'Color',
                                             name: 'colors',
+                                            id: 'colorsId',
                                             hiddenName: 'colors',
                                             mode: 'local',
                                             store: themeColor,
@@ -466,13 +525,25 @@
                                             value: '<%= tb.getFirstColor() %>',                                 
                                             width: 150
 	                                          }],
-	                                      buttons: [{text:'Submit',id:'mapSub'},
-	      	                                        {text: 'Reset',id:'mapRes'},
-	      	                                        {text: 'Print',id:'mapPrn',
-	      	                                         disabled: true,
+	                                      buttons: [{text:'Submit',
+	                                    	         id:'mapSub', 
+	                                    	         width:'52'},
+	      	                                        {text: 'Reset',
+	                                    	    	 id:'mapRes', 
+	                                    	    	 width:'52'},
+	      	                                        {text: 'PDF',
+	                                    	         id:'mapPrn', 
+	                                    	         width:'52',
+	      	                                         disabled: false,
 	      	                                         handler: function()
 	      	                                             { showPDFWin(); }
-	      	                                        }] 
+	      	                                        },
+	      	                                        {text: "Share",
+	      	                                         id: 'mapShare',
+	      	                                         width:'52',
+	      	                                         handler: function() 
+	      	                                           {shareView();} }
+                                                   ] 
 	      	                              },
 	      	                            	                             	      		      	                             
 	      	                              {region:'center',xtype:'panel',
@@ -489,16 +560,20 @@
 
         Ext.get('mapSub').on('click', function(){
             setThematics();
-            Ext.getCmp('mapPrn').setDisabled(false);
+            Ext.getCmp('mapPrn'  ).setDisabled(false);
+            Ext.getCmp('mapShare').setDisabled(false);
         });
 	    
         Ext.get('mapRes').on('click', function() {
             wmsLayer.setVisibility( false );
             wmsLayer_stile.setVisibility( false );
             Ext.get('mapLegend').update('&nbsp;',true);
-            Ext.getCmp('mapPrn').setDisabled(true);
+            Ext.getCmp('mapPrn'  ).setDisabled(true);
+            Ext.getCmp('mapShare').setDisabled(true);
         });
-        this.setOpenLayers();        
+        this.setOpenLayers(); 
+        this.setFromParams();
+        this.setThematics();
   })
 </SCRIPT>
 </HEAD>

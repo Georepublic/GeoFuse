@@ -120,8 +120,7 @@ textarea {
         </p>
     </div>
     
-    <textarea id="tdata">
-    </textarea>
+    <textarea id="tdata"></textarea>
     
     <br />
     <br />
