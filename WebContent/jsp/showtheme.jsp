@@ -50,8 +50,7 @@
   }
   
   function setThematics() {
-
-      wmsLayer.setVisibility( false );
+	  wmsLayer.setVisibility( false );
       wmsLayer_stile.setVisibility( false );
       
       Ext.get('mapLegend').update('&nbsp;',true);
@@ -210,6 +209,7 @@
       var sTypes    = Ext.get('types'    ).dom.value;
       var sColors   = Ext.get('colors'   ).dom.value;
       var sRanges   = Ext.get('ranges'   ).dom.value;
+      var sBaseLayer= map.baseLayer.id;
       
       url = url.concat("?<br>layer=").concat(sLayer);
       url = url.concat("<br>&bnd=").concat(sBnd);
@@ -217,17 +217,21 @@
       url = url.concat("<br>&types=").concat(sTypes);
       url = url.concat("<br>&ranges=").concat(sRanges);
       url = url.concat("<br>&colors=").concat(sColors);
+      url = url.concat("<br>&baselayer=").concat(sBaseLayer);
       
       Ext.MessageBox.alert( "Share View",url );
   }
 
   function setFromParams() {
 
-	  var pRanges   = this.getUrlVars()["ranges"];
-      var pCriteria = this.getUrlVars()["criteria"];
-      var pTypes    = this.getUrlVars()["types"];
-      var pColors   = this.getUrlVars()["colors"];
-      var pBnd      = this.getUrlVars()["bnd"];
+	  var pParams   = this.getUrlVars();
+	  
+	  var pRanges   = pParams["ranges"];
+      var pCriteria = pParams["criteria"];
+      var pTypes    = pParams["types"];
+      var pColors   = pParams["colors"];
+      var pBnd      = pParams["bnd"];
+      var pBaseLayer= pParams["baselayer"];
       
       if( pRanges != null )
     	  Ext.getCmp('rangesId').setValue(pRanges);
@@ -244,6 +248,10 @@
     			  tBnd[0],tBnd[1],tBnd[2],tBnd[3]) );
       }
       
+      if( pBaseLayer != null ) {    	  
+    	  var bLayer = map.getLayer( pBaseLayer );
+    	  map.setBaseLayer( bLayer );
+      }
   }
   
   function setPDF(title,description) {
@@ -374,21 +382,21 @@
                 'sphericalMercator': true
               },{isBaseLayer: true});
       
-      var googlePhys  = new OpenLayers.Layer.Google( 'Google Physical',
+      var googlePhys  = new OpenLayers.Layer.Google( 'GooglePhysical',
               { 'minZoomLevel'     : 1,
                 'maxZoomLevel'     : 20,
                 'type'             : google.maps.MapTypeId.TERRAIN,
                 'sphericalMercator': true
               },{isBaseLayer: true});
           
-       var googleSat   = new OpenLayers.Layer.Google( 'Google Satellite',
+       var googleSat   = new OpenLayers.Layer.Google( 'GoogleSatellite',
               { 'minZoomLevel'     : 1,
                 'maxZoomLevel'     : 20,
                 'type'             : google.maps.MapTypeId.HYBRID,
                 'sphericalMercator': true
               },{isBaseLayer: true});
        
-      var osm = new OpenLayers.Layer.OSM(); 
+      osm = new OpenLayers.Layer.OSM(); 
       
       var webtisMap = new webtis.Layer.BaseMap("電子国土Web");
 
