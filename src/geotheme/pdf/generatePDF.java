@@ -64,12 +64,16 @@ public class generatePDF {
         sb.append(this.pdfURL);
         sb.append("&layers=").append(this.pdfLayers);
         sb.append("&bbox=").append(wpb.getBBOX());
-        sb.append("&Format=image/jpeg");
         sb.append("&width=").append(width);
         sb.append("&height=").append(height);
-
-        try
-        {
+        sb.append("&styles=");
+        sb.append("&format=image/jpeg");
+        sb.append("&srs=epsg:4326");
+        sb.append("&service=wms");
+        sb.append("&version=1.1.1");
+        sb.append("&request=getmap");
+        
+        try {
             wpb.setREQUEST("GetMap");
             wpb.setWIDTH(Integer.toString(width));
             wpb.setHEIGHT(Integer.toString(height));
