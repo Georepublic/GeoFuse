@@ -221,13 +221,13 @@
       var sRanges   = Ext.get('ranges'   ).dom.value;
       var sBaseLayer= map.baseLayer.id;
       
-      url = url.concat("?<br>layer=").concat(sLayer);
-      url = url.concat("<br>&bnd=").concat(sBnd);
-      url = url.concat("<br>&criteria=").concat(sCriteria);
-      url = url.concat("<br>&types=").concat(sTypes);
-      url = url.concat("<br>&ranges=").concat(sRanges);
-      url = url.concat("<br>&colors=").concat(sColors);
-      url = url.concat("<br>&baselayer=").concat(sBaseLayer);
+      url = url.concat("?layer=").concat(sLayer);
+      url = url.concat("&bnd=").concat(sBnd);
+      url = url.concat("&criteria=").concat(sCriteria);
+      url = url.concat("&types=").concat(sTypes);
+      url = url.concat("&ranges=").concat(sRanges);
+      url = url.concat("&colors=").concat(sColors);
+      url = url.concat("&baselayer=").concat(sBaseLayer);
       
       Ext.MessageBox.alert( "Share View",url );
   }
@@ -565,7 +565,7 @@
                                             value: '<%= tb.getFirstColor() %>',                                 
                                             width: 150
 	                                          }],
-	                                      buttons: [{text:'<%= rb.getString("PB.SHARE") %>',
+	                                      buttons: [{text:'<%= rb.getString("PB.SUBMIT") %>',
 	                                    	         id:'mapSub', 
 	                                    	         width:'52'},
 	      	                                        {text: '<%= rb.getString("PB.RESET") %>',
