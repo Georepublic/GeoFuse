@@ -15,7 +15,8 @@
 <HEAD>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <TITLE>Geoserver Thematics</TITLE>
-<LINK rel="stylesheet" type="text/css" href="resources/lib/extJS/resources/css/ext-all.css" />
+<LINK rel="stylesheet" type="text/css" 
+      href="resources/lib/extJS/resources/css/ext-all.css" />
 <!-- 
 <SCRIPT type="text/javascript" src="resources/lib/OpenLayers/OpenLayers.js"></SCRIPT>
  -->
@@ -26,7 +27,8 @@
 
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"></script>
 
-<script type="text/javascript" src="http://portal.cyberjapan.jp/sys/v4/webtis/webtis_v4.js" 
+<script type="text/javascript" 
+        src="http://portal.cyberjapan.jp/sys/v4/webtis/webtis_v4.js" 
         charset="UTF-8"></script>     
 
 <SCRIPT type="text/javascript">
@@ -198,7 +200,66 @@
 	pdfWindow.show();
 	
   }
-  
+
+  function showShareWin( url ){
+	    var formItems = [
+	                     {
+	                         fieldLabel: 'URL',
+	                         id        : 'shareUrl',
+	                         allowBlank: false,
+	                         value     : url,
+	                         maxLength : 442,
+	                         minLength : 3,
+	                         width     : 400,
+	                         anchor    : '95%',
+	                         msgTarget : 'under'
+	                     }];  
+
+	    var formButtons = [
+	                       {   text    : "<%= rb.getString("SHR.SEL_BTN") %>",
+	                           formBind: false,
+	                           disabled: false,
+	                           handler : function() {
+	                        	   document.getElementById("shareUrl").select();
+	                           }
+	                       },
+	                       { text    : "<%= rb.getString("SHR.CLOSE_BTN") %>",
+	                           formBind: false,
+	                           disabled: false,
+	                           handler : function() {
+	                               shareWindow.close();
+	                           }
+	                       } ];
+	    
+	    var shareFormPanel = new Ext.FormPanel({
+	        id            : 'shareFormPanelId',
+	        monitorValid  : true,
+	        labelWidth    : 25,
+	        frame         : true,
+	        bodyStyle     : "padding:5px 5px 0",
+	        autoWidth     : true,
+	        autoHeight    : true,
+	        defaultType   : "textfield",
+	        buttonAlign   : 'center',
+	        items         : formItems,
+	        buttons       : formButtons
+	      });
+	    
+	    var shareWindow = new Ext.Window({
+	          id         : 'shareWindowId',
+	          title      : '<%= rb.getString("SHR.WIN_TITLE") %>',
+	          width      : 450,
+	          autoheight : true,
+	          hideBorders: true,
+	          resizable  : true,
+	          closable   : true,
+	          modal      : true,
+	          items      : [ shareFormPanel],
+	        });
+	    
+	    shareWindow.show();
+  }
+
   function getUrlVars() {
 	    var vars = {};
 	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, 
@@ -229,7 +290,7 @@
       url = url.concat("&colors=").concat(sColors);
       url = url.concat("&baselayer=").concat(sBaseLayer);
       
-      Ext.MessageBox.alert( "Share View",url );
+      showShareWin( url );
   }
 
   function setFromParams() {
